@@ -12,7 +12,16 @@ struct GDTDescriptor
     unsigned int cv_limitHigh:4;
     unsigned int cv_attribHigh:4;
     uint8_t  cv_baseHigh;
-}; __attribute__((__packed__))
+} __attribute__((__packed__));
+
+struct GDTPtr
+{
+    uint16_t cv_limit;
+    GDTDescriptor * cv_base;
+} __attribute__((__packed__));
+
+#define GDT_DESC_SIZE 6
+extern GDTDescriptor g_gdt[6];
 
 #define MakeDescriptor(base,limit,attributes) \
     {\
@@ -20,7 +29,7 @@ struct GDTDescriptor
 	(base  & 0xFFFF),\
 	((base  & 0xFF0000) >> 16),\
 	(attributes & 0xFF),\
-	((limit & 0xFF000000) >> 24),\
+	((limit & 0xF0000) >> 16),\
 	((attributes & 0xF00) >> 8),\
 	((base & 0xFF000000) >> 24),\
     }

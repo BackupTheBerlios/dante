@@ -7,11 +7,11 @@
 uint32_t g_chunkOfMem[1024*3] __attribute__((__aligned__(4096)));
 uint32_t * g_pageDirectory;
 uint32_t * g_idt;
-GDTDescriptor g_gdt[6] = { 
+GDTDescriptor g_gdt[GDT_DESC_SIZE] = { 
 			    MakeDescriptor(0,0,0), //NULL descriptor
-			    MakeDescriptor(0,0xFFFFF, attr_Gran_4k | attr_Big_Addr | attr_Present | attr_Code | attr_Code_Read), //Code descriptor - RNG0
+			    MakeDescriptor(0,0xFFFF0, attr_Gran_4k | attr_Big_Addr | attr_Present | attr_Code | attr_Code_Read), //Code descriptor - RNG0
 			    MakeDescriptor(0,0xFFFFF, attr_Gran_4k | attr_Big_Addr | attr_Present | attr_Data_Write), //Data descriptor - RNG0
-			    MakeDescriptor(0,0,0),
+			    MakeDescriptor(0xABCDEF45,0x67890,0x123),
 			    MakeDescriptor(0,0,0),
 			    MakeDescriptor(0,0,0)
 			};
@@ -39,14 +39,22 @@ void initializePaging()
      
     // start using page directory.
     register uint32_t reg_a = (uint32_t)(*LOWPTR(&g_pageDirectory));
-    asm("mov %0, %%cr3" : :"r" (reg_a));
-    asm("mov %%cr0, %0" : "=r" (reg_a) :);
+    asm volatile("mov %0, %%cr3" : :"r" (reg_a));
+    asm volatile("mov %%cr0, %0" : "=r" (reg_a) :);
     reg_a |= 0x80000000;
-    asm("mov %0, %%cr0" : :"r" (reg_a));
+    asm volatile("mov %0, %%cr0" : :"r" (reg_a));
     
     // clear IDT.
     for(int i = 0; i < 512; i++)
 	g_idt[i] = 0;
-     
+    
+    // load GDT 
+    GDTPtr l_tablePtr = { GDT_DESC_SIZE , g_gdt };
+    asm volatile("lgdt %0" : : "m" (l_tablePtr));
+
+    // Set CS?
+    reg_a = 1;
+    asm volatile("mov %%cs, %0": : "r" (reg_a)); 
+    
     return;
 }
