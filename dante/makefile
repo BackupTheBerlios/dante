@@ -4,3 +4,6 @@ all:
 
 clean:
 	make -C obj clean
+
+doxygen:
+	doxygen dante.dxy
