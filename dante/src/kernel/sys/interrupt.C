@@ -24,6 +24,31 @@ void InterruptHandler::handle(int i_interrupt, int i_value)
 {
     kout << "Un-handled interrupt occured. " << i_interrupt << ": " 
 	 << i_value << endl;
+
+    // Great for debug, dump stack.
+    /* 
+    {
+	register uint32_t l_cr2;
+	asm volatile("mov %%cr2, %0" : "=r" (l_cr2));
+	kout << "CR2 == " << l_cr2 << endl;
+
+	asm volatile("mov %%esp, %0" : "=r" (l_cr2));
+	while (l_cr2 < 0xc0101000)
+	{
+	    kout << l_cr2 << ": " << *(uint32_t *)l_cr2;
+	    l_cr2 += 4;
+	    kout << " " << *(uint32_t *)l_cr2;
+	    l_cr2 += 4;
+	    kout << " " << *(uint32_t *)l_cr2;
+	    l_cr2 += 4;
+	    kout << " " << *(uint32_t *)l_cr2;
+	    l_cr2 += 4;
+	    kout << endl;
+	}
+	
+	while(1);
+    }	
+    */
     
     // Clear int setting on PIC if needed.
     if ((i_interrupt >= 0x30) && (i_interrupt <= 0x38))

@@ -44,10 +44,12 @@ void KernelMain (void * i_bootHeader)
     }	
     //end static constructors. 
     
+    initializePIC(); // GRUB maps these to a low interrupt, map high before
+		     // enabling interrupts.
     initializeTasking();
     initializeInterrupts();
-    initializePIC();
-
+    initializePIC(); // Re-initialize in case we lost the timer.
+    
     kout.clear();
    
     extern uint32_t __KERNEL_END__;
@@ -56,7 +58,7 @@ void KernelMain (void * i_bootHeader)
     kout << "\tKernelMain loaded at " << (uint32_t) &KernelMain << "." << endl;
     kout << "\tKernel end at " << (uint32_t) &__KERNEL_END__ << "." << endl;
     kout << endl << endl;
-    
+     
     g_multiBoot = MultiBootParser(i_bootHeader);
     
     g_kernelPageDirectory.info();
