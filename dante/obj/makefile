@@ -1,5 +1,5 @@
 all:
-	(cd kernel; make) 
+	(cd kernel; ${MAKE}) 
 
 clean:
-	(cd kernel; make clean)
+	(cd kernel; ${MAKE} clean)

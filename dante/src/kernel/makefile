@@ -1,5 +1,5 @@
 all:
-	(cd boot; make)
-	(cd display; make)
-	(cd lib; make)
-	(cd mem; make)
+	(cd boot; ${MAKE})
+	(cd display; ${MAKE})
+	(cd lib; ${MAKE})
+	(cd mem; ${MAKE})

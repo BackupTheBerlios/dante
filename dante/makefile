@@ -1,9 +1,9 @@
 all:
-	(cd src; make)
-	(cd obj; make)
+	(cd src; ${MAKE})
+	(cd obj; ${MAKE})
 
 clean:
-	(cd obj; make clean)
+	(cd obj; ${MAKE} clean)
 
 doxygen:
 	doxygen dante.dxy
