@@ -18,6 +18,6 @@ void initializeTasking()
 
     g_initialTask.cv_currentCPU = &g_initialCPU;
 
-    register uint32_t reg_a = (uint32_t) &g_initialCPU;
-    asm volatile("mov %%dr3, %0" : : "r" (reg_a));
+    register uint32_t reg_a = (uint32_t) &g_initialTask;
+    asm volatile("mov %0, %%dr3" : : "r" (reg_a));
 }
