@@ -3,6 +3,7 @@
 //#include "multibootstructs.h"
 
 #include <mem/init.h>
+#include <mem/pageDir.h>
 #include <display/textStream.h>
 #include <boot/multiBoot.h>
 #include <mem/allocator.h>
@@ -43,11 +44,13 @@ void KernelMain (void * i_bootHeader)
     
     initializeTasking();
     initializeInterrupts();
+    kout.clear();
    
-    kout.clear(); 
+    extern uint32_t __KERNEL_END__;
     
     kout << endl << "Dante -- Inferno Kernel v0.1" << endl;
-    kout << "\tKernelMain loaded at " << (unsigned int) &KernelMain << ".";
+    kout << "\tKernelMain loaded at " << (uint32_t) &KernelMain << "." << endl;
+    kout << "\tKernel end at " << (uint32_t) &__KERNEL_END__ << "." << endl;
     kout << endl << endl;
     
     /*register uint32_t reg_a;
@@ -61,7 +64,9 @@ void KernelMain (void * i_bootHeader)
     kout << "DR3 " << reg_a << endl;*/
     
     g_multiBoot = MultiBootParser(i_bootHeader);
-
+    
+    g_kernelPageDirectory.info();
+    
     kout << endl << "Loading...";
      
     kout << "|";

@@ -3,7 +3,7 @@
 
 TextDriver::TextDriver()
 {
-    cv_buffer = (char *) 0x000b8000;
+    cv_buffer = (char *) 0xC00B8000;
     cv_pos = 0;
 }
 
