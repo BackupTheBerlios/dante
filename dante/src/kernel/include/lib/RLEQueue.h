@@ -28,6 +28,8 @@ class RLEQueue
 		    __node * l_node = new __node();
 		    l_node->cv_data = Pair<uint32_t, uint32_t>(i_val, i_len);
 		    l_node->cv_next = (__node *) NULL;
+
+		    return l_node;
 		};
 };
 

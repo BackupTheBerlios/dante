@@ -1,8 +1,11 @@
 #include <lib/RLEQueue.h>
 #include <stdint.h>
 
+#include <display/textStream.h>
+
 void RLEQueue::insert(uint32_t i_value, uint32_t i_length)
 {
+    
     if (NULL == cv_head)
     {
 	cv_head = new_node(i_value, i_length);

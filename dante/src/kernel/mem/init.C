@@ -2,8 +2,11 @@
 #include <stdint.h>
 #include <sys/gdt.h>
 #include <sys/task.h>
+#include <lib/RLEQueue.h>
 
 #include <display/textStream.h>
+
+RLEQueue g_freePageList;
 
 static uint32_t g_chunkOfMem[1024*2] __attribute__((__aligned__(4096)));
 uint32_t * g_pageDirectory;

@@ -46,5 +46,6 @@ SECTIONS
         *(COMMON)
         *(.bss)
         _ebss = .;
+	__KERNEL_END__ = .;
     }
 }

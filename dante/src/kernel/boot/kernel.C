@@ -49,7 +49,7 @@ void KernelMain (void * i_bootHeader)
     kout << endl << "Dante -- Inferno Kernel v0.1" << endl;
     kout << "\tKernelMain loaded at " << (unsigned int) &KernelMain << ".";
     kout << endl << endl;
-   
+    
     /*register uint32_t reg_a;
     asm volatile("mov %%dr0, %0" : "=r" (reg_a));
     kout << "DR0 " << reg_a << endl;
@@ -60,11 +60,6 @@ void KernelMain (void * i_bootHeader)
     asm volatile("mov %%dr3, %0" : "=r" (reg_a));
     kout << "DR3 " << reg_a << endl;*/
     
-    //kout << "GDT " << (unsigned int) g_gdt << endl;
-    //for (int i = 0; i < GDT_DESC_SIZE; i++)
-	//kout << ((uint32_t *) &g_gdt[i])[0] << ((uint32_t *) &g_gdt[i])[1] << endl;
-    //kout << endl;
-
     g_multiBoot = MultiBootParser(i_bootHeader);
 
     kout << endl << "Loading...";

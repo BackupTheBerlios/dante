@@ -1,6 +1,7 @@
 #include <boot/multiBoot.h>
 #include <display/textStream.h>
 #include <display/nullStream.h>
+#include <mem/init.h>
 #include <stdint.h>
 
 #define mb_out (cv_verboseParsing ? ((kostream&)kout) : ((kostream&)nout))
@@ -191,6 +192,34 @@ void MultiBootParser::parseMemMap(void * i_addr)
 	mb_out << "\t\t\tLenL  = " << l_mapPointer->cv_lengthLo;
 	mb_out << "\tLenH  = " << l_mapPointer->cv_lengthHi << endl;
 	
+	if (l_mapPointer->cv_baseAddrLo >= 0x100000)
+	{
+	    
+	    extern uint32_t __KERNEL_END__;
+	    uint32_t l_kern = (uint32_t) &__KERNEL_END__;
+
+	    l_kern = 0xC0000000 ^ (0 == l_kern % 4096 ?
+					l_kern :
+					l_kern - (l_kern % 4096) + 4096);
+	    
+	    if (l_mapPointer->cv_baseAddrLo >= l_kern)
+	    {
+		g_freePageList.insert(l_mapPointer->cv_baseAddrLo,
+				      l_mapPointer->cv_lengthLo >> 12);
+	    }
+	    else if ((l_mapPointer->cv_baseAddrLo + l_mapPointer->cv_lengthLo) >
+		     l_kern)
+	    {
+		uint32_t l_addr = l_mapPointer->cv_baseAddrLo;
+		uint32_t l_len = l_mapPointer->cv_lengthLo;
+		
+		l_addr += l_kern;
+		l_len -= l_kern;
+
+		g_freePageList.insert(l_addr, l_len >> 12);
+	    }
+	}
+		
 	l_bufSize -= l_mapPointer->cv_size;
 	l_mapPointer = (l_memMapStruct *) 
 		    (((uint32_t)l_mapPointer) + l_mapPointer->cv_size + 
