@@ -2,8 +2,13 @@ CXX = g++
 CC = gcc
 ASM = nasm
 
-CFLAGS = -nostdlib -nostdinc --no-builtin -O3 -g
-CXXFLAGS = -ffreestanding --no-exceptions -nostdinc++ --no-rtti
+CFLAGS = -O3 -g
+CXXFLAGS = 
+
+ifneq (1, ${USE_STDLIB})
+CFLAGS += -nostdlib -nostdinc --no-builtin 
+CXXFLAGS += -ffreestanding --no-exceptions -nostdinc++ --no-rtti
+endif
 
 ${DEST}%.o: %.c
 	${CC} -c ${CFLAGS} $< -o $@

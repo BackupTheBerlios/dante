@@ -82,5 +82,45 @@ void RLEQueue::insert(uint32_t i_value, uint32_t i_length)
 
 uint32_t RLEQueue::pop(uint32_t i_length)
 {
-    return 0;
+    __node * l_prev = (__node *) NULL;
+    __node * l_this = cv_head;
+    uint32_t l_val;
+    
+    bool l_done = false;
+    while(false == l_done)
+    {
+	if (NULL == l_this)
+	{
+	    l_done = true;
+	    break;
+	}
+	if (l_this->cv_data.second() >= i_length)
+	{
+	    l_done = true;
+	    break;
+	}
+	l_prev = l_this;
+	l_this = l_this->cv_next;
+    }
+
+    if (NULL == l_this)
+	return 0;
+    
+    if (l_this->cv_data.second() == i_length)
+    {
+	l_val = l_this->cv_data.first();
+	if (NULL != l_prev)
+	    l_prev->cv_next = l_this->cv_next;
+	if (cv_head == l_this)
+	    cv_head = l_this->cv_next;
+	delete l_this;
+    }
+    else
+    {
+	l_val = l_this->cv_data.first();
+	l_this->cv_data.first() += i_length;
+	l_this->cv_data.second() -= i_length;
+    }
+    
+    return l_val;
 }

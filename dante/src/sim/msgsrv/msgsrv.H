@@ -1,0 +1,18 @@
+#ifndef __SIM_MSGSRV_MSGSRV_H
+#define __SIM_MSGSRV_MSGSRV_H
+
+const char * MSGSRV_ADDR = "/tmp/d_msgsrv";
+
+enum msgsrv_cmds
+{
+    MSGSRV_CMD_INVAL = 0,
+    MSGSRV_CMD_NEWCON,
+    MSGSRV_CMD_BIND,
+    MSGSRV_CMD_CONNECT,
+    MSGSRV_CMD_MSGRECV,
+    MSGSRV_CMD_MSGSEND,
+    MSGSRV_CMD_MSGRPLY,
+    MSGSRV_CMD_CLOSE
+};
+
+#endif
