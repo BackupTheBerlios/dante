@@ -67,6 +67,9 @@ void initializeInterrupts()
     
     GDTPtr l_tablePtr = { 512*4, (GDTDescriptor *) g_idt };
     asm volatile("lidt %0" : : "m" (l_tablePtr));
+    asm volatile("ljmp $0x08, $int_finalize\n"
+		 "int_finalize:");
+		 
 
 }
     
