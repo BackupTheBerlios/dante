@@ -1,6 +1,7 @@
 ; start.asm
 
     global KernelEntry
+    global __AAA_MULTIBOOT
     extern KernelMain
 
     bits 32
@@ -21,8 +22,8 @@ KernelEntry__loop1:
     hlt ; just in case we return for some reason.
     jmp KernelEntry__loop1
 
+segment .multiboot
 ; The Multiboot header
-
     align 4
     dd MAGIC
     dd FLAGS

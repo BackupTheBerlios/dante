@@ -5,6 +5,7 @@ include ../../../configure.mk
 CFLAGS += -I../include
 
 OBJECTS = ${DEST}baseAlloc.o
+OBJECTS += ${DEST}init.o
 
 all: ${OBJECTS}
 	

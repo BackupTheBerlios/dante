@@ -2,7 +2,7 @@ CXX = g++
 CC = gcc
 ASM = nasm
 
-CFLAGS = -nostdlib -nostdinc --no-builtin -O3
+CFLAGS = -nostdlib -nostdinc --no-builtin #-O3
 CXXFLAGS = -ffreestanding --no-exceptions -nostdinc++ --no-rtti
 
 ${DEST}%.o: %.c

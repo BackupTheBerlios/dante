@@ -2,6 +2,7 @@
 
 //#include "multibootstructs.h"
 
+#include <mem/init.h>
 #include <display/textStream.h>
 #include <boot/multiBoot.h>
 #include <mem/allocator.h>
@@ -9,7 +10,7 @@
 extern "C"
 void KernelMain (void * i_bootHeader)
 {
-
+    initializePaging();
     //do static constructors.
     extern void (* __CTOR_LIST__)();
     void (** l_ctor)() = &__CTOR_LIST__;
@@ -21,8 +22,7 @@ void KernelMain (void * i_bootHeader)
 	l_ctorCount--;
 	l_ctor++;
     }
-    //end static constructors.
-    
+    //end static constructors. 
     kout.clear();
 
     kout << endl << "Dante -- Inferno Kernel v0.1" << endl;
