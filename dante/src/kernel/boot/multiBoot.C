@@ -3,6 +3,7 @@
 #include <display/nullStream.h>
 #include <mem/init.h>
 #include <stdint.h>
+#include <lib/Algo.h>
 
 #define mb_out (cv_verboseParsing ? ((kostream&)kout) : ((kostream&)nout))
 
@@ -147,6 +148,16 @@ void MultiBootParser::parseModules(void * i_addr)
 
     mb_out << "\t\tModules: " << cv_modCount << " at " ;
     mb_out << (uint32_t) cv_modAddress << endl;
+
+    for(int i = 0; i < cv_modCount; i++)
+    {
+	Module l_module = 
+		{ 
+		    (void*)((uint32_t **)cv_modAddress)[4*i] , 
+		    (void*)((uint32_t **)cv_modAddress)[4*i+1] 
+		};
+	cv_modules.push(l_module);
+    };
 }
 
 void MultiBootParser::parseSymbolTable(void * i_addr, imageType i_type)
@@ -192,31 +203,85 @@ void MultiBootParser::parseMemMap(void * i_addr)
 	mb_out << "\t\t\tLenL  = " << l_mapPointer->cv_lengthLo;
 	mb_out << "\tLenH  = " << l_mapPointer->cv_lengthHi << endl;
 	
+	// For now we are just using memory above the first meg.	
 	if (l_mapPointer->cv_baseAddrLo >= 0x100000)
 	{
 	    
-	    extern uint32_t __KERNEL_END__;
+	    extern volatile uint32_t __KERNEL_END__;
 	    uint32_t l_kern = (uint32_t) &__KERNEL_END__;
 
-	    l_kern = 0xC0000000 ^ (0 == l_kern % 4096 ?
-					l_kern :
-					l_kern - (l_kern % 4096) + 4096);
+	    l_kern = 0xC0000000 ^ align<4096>(l_kern);
+	    
+	    uint32_t l_addr = l_mapPointer->cv_baseAddrLo;
+	    uint32_t l_len = l_mapPointer->cv_lengthLo;
 	    
 	    if (l_mapPointer->cv_baseAddrLo >= l_kern)
 	    {
-		g_freePageList.insert(l_mapPointer->cv_baseAddrLo,
-				      l_mapPointer->cv_lengthLo >> 12);
 	    }
 	    else if ((l_mapPointer->cv_baseAddrLo + l_mapPointer->cv_lengthLo) >
-		     l_kern)
+		    l_kern)
 	    {
-		uint32_t l_addr = l_mapPointer->cv_baseAddrLo;
-		uint32_t l_len = l_mapPointer->cv_lengthLo;
-		
-		l_addr += l_kern;
-		l_len -= l_kern;
+		l_len -= l_kern - l_addr;
+		l_addr = l_kern;
+	    }
+	    else
+	    {
+		l_len = 0;
+	    }
+	    
+	    while (l_len > 0)
+	    {
+		bool l_found = false;
+		uint32_t l_module;
 
-		g_freePageList.insert(l_addr, l_len >> 12);
+		for (int i = 0; i < cv_modules.size(); i++)
+		{
+		    if (pair_overlap<uint32_t>(
+				Pair<uint32_t,uint32_t>((uint32_t)cv_modules[i].cv_start, align<4096>((uint32_t)cv_modules[i].cv_end)),
+				Pair<uint32_t,uint32_t>(l_addr, l_addr+l_len)))
+		    {
+			if (!l_found)
+			{
+			    l_module = i;
+			    l_found = true;
+			}
+			else if (cv_modules[i].cv_start < 
+				 cv_modules[l_module].cv_start)
+			{
+			    l_module = i;
+			}
+		    }
+		}
+
+		if (!l_found)
+		{
+		    g_freePageList.insert(l_addr, l_len >> 12);
+		    l_len = 0;
+		}
+		else
+		{
+		    uint32_t l_start = (uint32_t)cv_modules[l_module].cv_start;
+		    uint32_t l_end = (uint32_t)cv_modules[l_module].cv_end;
+
+		    l_end = align<4096>(l_end);
+
+		    if (l_addr < l_start)
+		    {
+			g_freePageList.insert(l_addr, (l_start-l_addr) >> 12);
+			l_len -= (l_start-l_addr);
+			l_addr = l_start;
+		    }
+		    if ((l_addr + l_len) < l_end)
+		    {
+			l_len = 0;
+		    }
+		    else
+		    {
+			l_len -= l_end - l_addr;
+			l_addr = l_end;
+		    }
+		}
+
 	    }
 	}
 		

@@ -7,10 +7,12 @@ template <typename _A>
 class Queue
 {
     public:
-	Queue() : cv_head((__node *) NULL) {};
+	Queue() : cv_head((__node *) NULL), cv_size(0) {};
 
 	void push(_A i_value)
 	    {
+		cv_size++;
+		
 		if (NULL == cv_head)
 		{
 		    cv_head = cv_tail = new_node(i_value);
@@ -18,7 +20,7 @@ class Queue
 		}
 		
 		cv_head->cv_next = new_node(i_value);
-		cv_head = cv_next;
+		cv_head = cv_head->cv_next;
     		
 	    };
 
@@ -42,9 +44,27 @@ class Queue
 		    cv_tail = cv_tail->cv_next;
 		    delete cv_tmp;
 		}
-
+		
+		cv_size--;
 		return l_rval;
 	    };
+
+	uint32_t size() { return cv_size; };
+	
+	_A operator[](uint32_t i_pos)
+	{
+	    if (i_pos >= cv_size)
+		return _A();
+
+	    __node * l_temp = cv_head;
+	    while((l_temp != NULL) && (0 != i_pos))
+	    {
+		i_pos--; l_temp = l_temp->cv_next;
+	    }
+	    if (l_temp == NULL)
+		return _A();
+	    return l_temp->cv_data;
+	};
 	
     private:
 	class __node
@@ -56,6 +76,7 @@ class Queue
 
 	__node * cv_head;
 	__node * cv_tail;
+	uint32_t cv_size;
 
 	__node * new_node(_A i_value)
 	{
@@ -66,7 +87,7 @@ class Queue
 	    return l_node;
 	};
 
-}
+};
 
 #endif
 

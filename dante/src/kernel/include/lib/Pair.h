@@ -19,4 +19,14 @@ class Pair
 	const _B & second() const { return cv_second; };
 };
 
+#include <display/textStream.h>
+template <typename _A>
+bool pair_overlap(const Pair<_A,_A> i_first, const Pair<_A,_A> i_second)
+{
+    if ((i_first.first() >= i_second.second()) || 
+       (i_first.second() <= i_second.first()))
+	   return false;
+    return true;
+};
+
 #endif

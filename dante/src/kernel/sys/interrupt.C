@@ -63,12 +63,12 @@ INTERRUPT_WITHOUT_ERROR(19);
 asm (".global __interrupt_tail");
 asm (".text");
 asm ("__interrupt_tail:");
-asm ("pusha");
+asm ("pushal");
 asm ("pushl 0x24(%esp)");
 asm ("pushl 0x24(%esp)");
 asm ("call interrupt_handler");
 asm ("add $0x8, %esp");
-asm ("popa");
+asm ("popal");
 asm ("	add $0x8, %esp");
 asm ("	iret");
 
