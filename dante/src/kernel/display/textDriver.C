@@ -51,7 +51,7 @@ void TextDriver::print(const char * i_string)
 	    }
 	    for (int i = (160*24); i < (160*25); i++)
 	    {
-		cv_buffer[i] = '\0';
+		cv_buffer[i] = ' ';
 	    }
 	    cv_pos -= 80;
 	}
@@ -68,7 +68,8 @@ void TextDriver::clear(void)
 {
     for (int i = 0; i < (80*25); i++)
     {
-	cv_buffer[i<<1] = '\0';
+	cv_buffer[(i<<1 + 1)] = '\7';
+	cv_buffer[i<<1] = ' ';
     }
     cv_pos = 0;
 };

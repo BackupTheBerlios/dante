@@ -59,6 +59,22 @@ uint32_t PageDir::findFreeAddress(bool i_high)
     return 0;
 }
 
+uint32_t PageDir::findFreePageTableAddress(bool i_high)
+{
+    uint32_t l_min = (false == i_high ? 0 : 768);
+    uint32_t l_max = (false == i_high ? 768 : 1024);
+
+    for (int i = l_min; i < l_max; i++)
+    {
+	if (cv_virtualPageDir[i] == 0)
+	{
+	    return (i << 22);
+	}
+    }
+    
+    return 0;
+}
+
 uint32_t PageDir::readPageFlags(uint32_t i_pageAddress)
 {
     uint32_t l_indexI, l_indexJ;

@@ -12,7 +12,7 @@ struct CPUDescriptor
     TaskDescriptor * cv_currentTask;
     
     uint32_t cv_cpuID;
-    
+    	
     // need some bucket for tasks.
 } __attribute__((__packed__));
 

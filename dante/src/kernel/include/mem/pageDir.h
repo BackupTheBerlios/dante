@@ -23,6 +23,7 @@ class PageDir
 	    }
 
 	uint32_t findFreeAddress(bool i_high = false);
+	uint32_t findFreePageTableAddress(bool i_high = false);
 
 	uint32_t readPageFlags(uint32_t i_pageAddress);
 	void writePageFlags(uint32_t i_pageAddress, uint32_t i_flags);
