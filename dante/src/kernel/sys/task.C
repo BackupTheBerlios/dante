@@ -21,3 +21,4 @@ void initializeTasking()
     register uint32_t reg_a = (uint32_t) &g_initialTask;
     asm volatile("mov %0, %%dr3" : : "r" (reg_a));
 }
+

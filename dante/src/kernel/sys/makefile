@@ -5,6 +5,7 @@ include ../../../configure.mk
 CFLAGS += -I../include
 
 OBJECTS = ${DEST}task.o
+OBJECTS += ${DEST}interrupt.o
 
 all: ${OBJECTS}
 	

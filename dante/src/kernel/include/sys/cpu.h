@@ -7,7 +7,7 @@ struct TaskDescriptor;
 
 struct CPUDescriptor
 {
-    void * cv_kernelStack;
+    void * cv_kernelStack; // esp.
     uint32_t cv_kernelPageDir; // cr3.
     TaskDescriptor * cv_currentTask;
     

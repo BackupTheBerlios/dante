@@ -10,9 +10,9 @@ struct TaskDescriptor
     CPUDescriptor * cv_currentCPU;
 
     // registers..
-    uint32_t	eflags, cr3;
-    uint32_t	eax, ecx, edx, ebx;
-    uint32_t	esp, ebp, esi, edi;
+    uint32_t	cr3, esp, eflags;
+    uint32_t	eax, ebx, ecx, edx;
+    uint32_t	ebp, esi, edi;
      
 } __attribute__((__packed__));
 
