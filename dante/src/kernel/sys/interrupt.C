@@ -3,6 +3,7 @@
 #include <sys/interrupt.h>
 #include <display/textStream.h>
 #include <sys/gdt.h>
+#include <sys/task.h>
 
 uint32_t g_idt[512] __attribute__((__aligned__(4096)));
 
@@ -13,19 +14,21 @@ extern "C" void interrupt_handler()
 
 #define INTERRUPT_WITH_ERROR(number) \
     extern "C" void __interrupt_##number (); \
-    asm(".global __interrupt_"#number); \
-    asm("__interrupt_"#number":"); \
-    asm("	pushl $"#number); \
-    asm("	jmp __interrupt_tail");
+    asm (".global __interrupt_"#number); \
+    asm (".text"); \
+    asm ("__interrupt_"#number":"); \
+    asm ("	pushl $"#number); \
+    asm ("	jmp __interrupt_tail");
  
 
 #define INTERRUPT_WITHOUT_ERROR(number) \
     extern "C" void __interrupt_##number (); \
-    asm(".global __interrupt_"#number); \
-    asm("__interrupt_"#number":"); \
-    asm("	pushl $0"); \
-    asm("	pushl $"#number); \
-    asm("	jmp __interrupt_tail");
+    asm (".global __interrupt_"#number); \
+    asm (".text"); \
+    asm ("__interrupt_"#number":"); \
+    asm ("	pushl $0"); \
+    asm ("	pushl $"#number); \
+    asm ("	jmp __interrupt_tail");
 
 INTERRUPT_WITHOUT_ERROR(0);
 INTERRUPT_WITHOUT_ERROR(1);
@@ -47,11 +50,14 @@ INTERRUPT_WITH_ERROR(17);
 INTERRUPT_WITHOUT_ERROR(18);
 INTERRUPT_WITHOUT_ERROR(19);
 
-asm(".global __interrupt_tail");
-asm("__interrupt_tail:");
-asm("call interrupt_handler");
-asm("	add $0x8, %esp");
-asm("	iret");
+asm (".global __interrupt_tail");
+asm (".text");
+asm ("__interrupt_tail:");
+asm ("pusha");
+asm ("call interrupt_handler");
+asm ("popa");
+asm ("	add $0x4, %esp");
+asm ("	iret");
 
 
 #define INTERRUPT_DESCRIPTOR_ENTRY(index, address) \
@@ -60,8 +66,12 @@ asm("	iret");
 
 void initializeInterrupts()
 {
-    for (int i = 0; i < 512; i++)
-	g_idt[i] = 0;
+    INTERRUPT_DESCRIPTOR_ENTRY(0, __interrupt_0);
+    for (int i = 0; i < 256; i++)
+    {
+	g_idt[i] = g_idt[0];
+	g_idt[i+1] = g_idt[1];
+    }
     
     INTERRUPT_DESCRIPTOR_ENTRY(0, __interrupt_0);
     INTERRUPT_DESCRIPTOR_ENTRY(1, __interrupt_1);
@@ -86,6 +96,23 @@ void initializeInterrupts()
     
     GDTPtr l_tablePtr = { 512*4, (GDTDescriptor *) g_idt };
     asm volatile("lidt %0" : : "m" (l_tablePtr));
+    
+    for (int i = 0; i < sizeof(TSSDescriptor); i++)
+	((uint8_t *) &g_initialTSS)[i] = 0;
+
+    register uint32_t reg_a; 
+    g_initialTSS.cv_ss0 = 0x0010;
+    asm volatile("mov %%esp, %0" : "=r" (reg_a)); 
+    g_initialTSS.cv_esp0 = reg_a;
+    asm volatile("mov %%cr3, %0" : "=r" (reg_a));
+    g_initialTSS.cv_cr3 = reg_a;
+    
+    // Load initial TSS. 
+    asm volatile("mov $0x28, %%eax; ltr %%ax" : : : "eax");
+    asm volatile("loaded_tss:");
+    
+    // Turn on interrupts now.
+    asm volatile("sti");
 
 }
     

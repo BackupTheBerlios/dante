@@ -21,7 +21,7 @@ struct GDTPtr
 } __attribute__((__packed__));
 
 #define GDT_DESC_SIZE 6
-extern GDTDescriptor g_gdt[6];
+extern GDTDescriptor g_gdt[GDT_DESC_SIZE];
 
 #define MakeDescriptor(base,limit,attributes) \
     {\

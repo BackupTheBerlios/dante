@@ -1,6 +1,7 @@
 #include <mem/init.h>
 #include <stdint.h>
 #include <sys/gdt.h>
+#include <sys/task.h>
 
 #include <display/textStream.h>
 
@@ -43,11 +44,12 @@ void initializePaging()
     asm volatile("mov %0, %%cr0" : :"r" (reg_a));
     
     // load GDT 
-    GDTPtr l_tablePtr = { GDT_DESC_SIZE*8 , (g_gdt) };
+    g_gdt[5] = (GDTDescriptor) MakeDescriptor(((uint32_t)&g_initialTSS), sizeof(TSSDescriptor), attr_TSS | attr_Present | 0x100);
+    GDTPtr l_tablePtr = { GDT_DESC_SIZE*8 , g_gdt };
     asm volatile("lgdt %0" : : "m" (l_tablePtr));
     asm volatile("ljmp $0x08, $cs_finalize\n"
-		 "cs_finalize:"
-		 : : );
+    		 "cs_finalize:"
+    		 : : );
     
     // load SS, DS, ES, FS, GS.
     reg_a = 0x10; 
@@ -56,6 +58,6 @@ void initializePaging()
     asm volatile("mov %0, %%es": : "r" (reg_a));
     asm volatile("mov %0, %%fs": : "r" (reg_a));
     asm volatile("mov %0, %%gs": : "r" (reg_a));
-
+    
     return;
 }

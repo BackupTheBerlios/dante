@@ -9,6 +9,8 @@ static CPUDescriptor g_initialCPU;   // cpu 0.
 
 static uint8_t g_kernelStack[8192] __attribute__((__aligned__(4096)));
 
+TSSDescriptor g_initialTSS;
+
 void initializeTasking()
 {
     g_initialCPU.cv_kernelStack = (void *) &g_kernelStack[8192];   

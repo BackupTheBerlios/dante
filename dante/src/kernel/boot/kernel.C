@@ -16,8 +16,17 @@ void KernelMain (void * i_bootHeader)
 {
     initializePaging();
 
+    register uint32_t reg_a;
+    
     //patch up address.
     asm volatile("ljmp $0x08, $main_patch\nmain_patch:" : :);
+    asm volatile("mov %%esp, %0" : "=r" (reg_a));
+    reg_a |= 0xC0000000;
+    asm volatile("mov %0, %%esp" : : "r" (reg_a));
+    asm volatile("mov %%ebp, %0" : "=r" (reg_a));
+    reg_a |= 0xC0000000;
+    asm volatile("mov %0, %%ebp" : : "r" (reg_a));
+
     
     //do static constructors.
     extern void (* __CTOR_LIST__)();
