@@ -4,6 +4,7 @@
 
 #include <display/textStream.h>
 #include <boot/multiBoot.h>
+#include <mem/allocator.h>
 
 extern "C"
 void KernelMain (void * i_bootHeader)
