@@ -8,6 +8,7 @@
 #include <mem/allocator.h>
 
 #include <sys/gdt.h>
+#include <sys/task.h>
 
 extern "C"
 void KernelMain (void * i_bootHeader)
@@ -27,8 +28,11 @@ void KernelMain (void * i_bootHeader)
 	(*l_ctor)();
 	l_ctorCount--;
 	l_ctor++;
-    }
+    }	
     //end static constructors. 
+    
+    initializeTasking();
+    
     kout.clear();
 
     kout << endl << "Dante -- Inferno Kernel v0.1" << endl;

@@ -4,7 +4,7 @@
 
 #include <display/textStream.h>
 
-uint32_t g_chunkOfMem[1024*3] __attribute__((__aligned__(4096)));
+static uint32_t g_chunkOfMem[1024*3] __attribute__((__aligned__(4096)));
 uint32_t * g_pageDirectory;
 uint32_t * g_idt;
 GDTDescriptor g_gdt[GDT_DESC_SIZE] = { 
