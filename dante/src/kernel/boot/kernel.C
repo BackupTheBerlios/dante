@@ -80,7 +80,7 @@ void KernelMain (void * i_bootHeader)
     kout << "|";
     while (1)
     {
-#define SLEEP_A_BIT for(int i = 0; i < 1000000; i++)
+#define SLEEP_A_BIT asm volatile("hlt")//for(int i = 0; i < 1000000; i++)
 	kout << "\b/";
 	SLEEP_A_BIT;
 	kout << "\b-";

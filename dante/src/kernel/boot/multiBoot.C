@@ -285,7 +285,7 @@ void MultiBootParser::parseMemMap(void * i_addr)
 	    }
 	}
 		
-	l_bufSize -= l_mapPointer->cv_size;
+	l_bufSize -= (l_mapPointer->cv_size + (0 == i ? 4 : 4));
 	l_mapPointer = (l_memMapStruct *) 
 		    (((uint32_t)l_mapPointer) + l_mapPointer->cv_size + 
 			(0 == i ? 4 : 4));
