@@ -52,7 +52,7 @@ void TextDriver::print(const char * i_string)
 	    {
 		cv_buffer[i] = '\0';
 	    }
-	    cv_pos -= 160;
+	    cv_pos -= 80;
 	}
 	
     }
