@@ -22,7 +22,7 @@ class PageDir
 	uint32_t findFreeAddress(bool i_high = false);
 
 	uint32_t readPageFlags(uint32_t i_pageAddress);
-	uint32_t writePageFlags(uint32_t i_pageAddress, uint32_t i_flags);
+	void writePageFlags(uint32_t i_pageAddress, uint32_t i_flags);
 	bool checkPageFlags(uint32_t i_pageAddress, uint32_t i_flags)
 	    {
 		if (i_flags & this->readPageFlags(i_pageAddress))
@@ -35,16 +35,19 @@ class PageDir
 	    PRESENT = 		0x001,
 	    WRITE = 		0x002,
 	    SUPERVISOR = 	0x004,
-	    CACHE_DISABLE = 	0x008,
-	    ACCESSED = 		0x010,
-	    DIRTY = 		0x020,
-	    PAGESIZE = 		0x040,
-	    GLOBAL = 		0x080,
-	    USER1 = 		0x100,
-	    USER2 =		0x200,
-	    USER3 =		0x400,
+	    WRITE_THROUGH =	0x008,
+	    CACHE_DISABLE = 	0x010,
+	    ACCESSED = 		0x020,
+	    DIRTY = 		0x040,
+	    PAGESIZE = 		0x080,
+	    GLOBAL = 		0x100,
+	    USER1 = 		0x200,
+	    USER2 =		0x400,
+	    USER3 =		0x800,
 	};
-	    
+    
+    void mapPage(uint32_t i_virtAddr, uint32_t i_physAddr);
+	
 	
     private:
 	uint32_t * cv_pageDir;

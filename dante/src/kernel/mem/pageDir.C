@@ -56,3 +56,66 @@ uint32_t PageDir::findFreeAddress(bool i_high)
     return 0;
 }
 
+uint32_t PageDir::readPageFlags(uint32_t i_pageAddress)
+{
+    uint32_t l_indexI, l_indexJ;
+
+    l_indexI = i_pageAddress >> 22;
+    l_indexJ = i_pageAddress >> 12 & 0x3FF;
+
+    uint32_t * l_pageTable = (uint32_t *)(cv_virtualPageDir[l_indexI]);
+
+    if (NULL == l_pageTable)
+    {
+	// need to map it in.
+	return 0; // for now.
+    }
+    else
+    {
+	return l_pageTable[l_indexJ] & 0x0FFF;
+    }
+};
+
+void PageDir::writePageFlags(uint32_t i_pageAddress, uint32_t i_flags)
+{
+    uint32_t l_indexI, l_indexJ;
+
+    l_indexI = i_pageAddress >> 22;
+    l_indexJ = i_pageAddress >> 12 & 0x3FF;
+
+    uint32_t * l_pageTable = (uint32_t *)(cv_virtualPageDir[l_indexI]);
+
+    if (NULL == l_pageTable)
+    {
+	// need to map it in.
+    }
+    else
+    {
+	l_pageTable[l_indexJ] = (l_pageTable[l_indexJ] & 0xFFFFF000) 
+			      | (i_flags & 0x0FFF);
+    }
+    return;
+};
+
+void PageDir::mapPage(uint32_t i_virtAddr, uint32_t i_physAddr)
+{
+    uint32_t l_indexI, l_indexJ;
+
+    l_indexI = i_virtAddr >> 22;
+    l_indexJ = i_virtAddr >> 12 & 0x3FF;
+
+    i_physAddr = i_physAddr & 0xFFFFF000;
+
+    uint32_t * l_pageTable = (uint32_t *)(cv_virtualPageDir[l_indexI]);
+
+    if (NULL == l_pageTable)
+    {
+	// need to map it in.
+    }
+    else
+    {
+	l_pageTable[l_indexJ] = i_physAddr | (l_pageTable[l_indexJ] & 0x0FFF);
+    }
+    return;
+}
+
