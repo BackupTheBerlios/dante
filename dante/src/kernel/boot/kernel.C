@@ -8,13 +8,23 @@
 extern "C"
 void KernelMain (void * i_bootHeader)
 {
+
     //do static constructors.
-    kout = TextStream();
+    extern void (* __CTOR_LIST__)();
+    void (** l_ctor)() = &__CTOR_LIST__;
+    int l_ctorCount = *(int *)l_ctor;
+    l_ctor++;
+    while(l_ctorCount)
+    {
+	(*l_ctor)();
+	l_ctorCount--;
+	l_ctor++;
+    }
     //end static constructors.
     
     kout.clear();
 
-    kout << "Dante Kernel v0.1" << endl;
+    kout << endl << "Dante -- Inferno Kernel v0.1" << endl;
     kout << "\tKernelMain loaded at " << (unsigned int) &KernelMain << ".";
     kout << endl << endl;
 

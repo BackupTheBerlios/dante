@@ -3,10 +3,11 @@
 
 #include <stdint.h>
 #include <display/textDriver.h>
+#include <display/kostream.h>
 
 #include <lib/Pair.h>
 
-class TextStream
+class TextStream : public kostream
 {
     public:
 	TextStream();

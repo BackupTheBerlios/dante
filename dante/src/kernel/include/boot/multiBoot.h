@@ -19,6 +19,8 @@ class MultiBootParser
 	    
 
     private:
+	bool cv_verboseParsing;
+	
 	uint32_t cv_flags;
 	char * cv_cmdLine;
 	
