@@ -1,0 +1,3 @@
+sudo mount -t vfat -o loop dante.flp image
+sudo cp obj/kernel/kernel.elf image/boot/
+sudo umount image
