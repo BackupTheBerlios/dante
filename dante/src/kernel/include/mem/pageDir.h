@@ -7,7 +7,10 @@ class PageDir
 {
     public:
 	PageDir();
-	PageDir(uint32_t * i_pageDirAddr, uint32_t * i_pageDirVirtAddr);
+	PageDir(uint32_t * i_pageDirAddr, 
+		uint32_t * i_pageDirVirt, 
+		uint32_t * i_pageDirVirtAddr);
+	
 	PageDir(const PageDir&);
 	~PageDir();
 
@@ -28,7 +31,17 @@ class PageDir
 		if (i_flags & this->readPageFlags(i_pageAddress))
 		    return true;
 		return false;
+	    };
+
+	uint32_t readPageTableFlags(uint32_t i_idx);
+	void writePageTableFlags(uint32_t i_idx, uint32_t i_flags);
+	bool checkPageTableFlags(uint32_t i_idx, uint32_t i_flags)
+	    {
+		if (i_flags & this->readPageTableFlags(i_idx))
+		    return true;
+		return false;
 	    }
+
 
 	enum PageFlags
 	{
@@ -47,10 +60,12 @@ class PageDir
 	};
     
     void mapPage(uint32_t i_virtAddr, uint32_t i_physAddr);
+    void mapPageTable(uint32_t i_idx, uint32_t i_virtAddr, uint32_t i_physAddr);
 	
 	
     private:
 	uint32_t * cv_pageDir;
+	uint32_t * cv_pageDirVirt;
 	uint32_t * cv_virtualPageDir;
 };
 

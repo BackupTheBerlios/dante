@@ -9,6 +9,7 @@ RLEQueue g_freePageList;
 
 static uint32_t g_chunkOfMem[1024*3] __attribute__((__aligned__(4096)));
 uint32_t * g_pageDirectory;
+uint32_t * g_pageDirVirt;
 uint32_t * g_virtualPageDirectory;
 
 GDTDescriptor g_gdt[GDT_DESC_SIZE] = { 
@@ -51,6 +52,7 @@ void initializePaging()
     // We want the virtual page pointer to be a virtual address, so fix.
     LOWPTR(&g_virtualPageDirectory)[0]
 		= 0x2000 + (uint32_t)(g_chunkOfMem); 
+    LOWPTR(&g_pageDirVirt)[0] = 0x1000 + (uint32_t)(g_chunkOfMem);
      
     // start using page directory.
     register uint32_t reg_a = (uint32_t)(*LOWPTR(&g_pageDirectory));

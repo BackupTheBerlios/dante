@@ -3,8 +3,9 @@
 #include <stdint.h>
 
 #include <display/textStream.h>
+#include <sys/interrupt.h>
 
-PageDir g_kernelPageDirectory(g_pageDirectory, g_virtualPageDirectory);
+PageDir g_kernelPageDirectory(g_pageDirectory, g_pageDirVirt, g_virtualPageDirectory);
 
 PageDir::PageDir()
 {
@@ -18,11 +19,13 @@ PageDir::PageDir(const PageDir&)
     // copy from kernel page table.
 };
 
-PageDir::PageDir(uint32_t * i_pageDirAddr, uint32_t * i_pageDirVirtAddr)
+PageDir::PageDir(uint32_t * i_pageDirAddr, 
+		 uint32_t * i_pageDirVirt, 
+		 uint32_t * i_pageDirVirtAddr)
 {
     cv_pageDir = i_pageDirAddr;
+    cv_pageDirVirt = i_pageDirVirt;
     cv_virtualPageDir = i_pageDirVirtAddr;
-
 };
 
 PageDir::~PageDir()
@@ -68,6 +71,7 @@ uint32_t PageDir::readPageFlags(uint32_t i_pageAddress)
     if (NULL == l_pageTable)
     {
 	// need to map it in.
+	kpanic("Page table is not mapped into virtual memory.");
 	return 0; // for now.
     }
     else
@@ -88,6 +92,7 @@ void PageDir::writePageFlags(uint32_t i_pageAddress, uint32_t i_flags)
     if (NULL == l_pageTable)
     {
 	// need to map it in.
+	kpanic("Page table is not mapped into virtual memory.");
     }
     else
     {
@@ -96,6 +101,27 @@ void PageDir::writePageFlags(uint32_t i_pageAddress, uint32_t i_flags)
     }
     return;
 };
+
+uint32_t PageDir::readPageTableFlags(uint32_t i_idx)
+{
+    return cv_virtualPageDir[i_idx] & 0x0FFF;
+}
+
+void PageDir::writePageTableFlags(uint32_t i_idx, uint32_t i_flags)
+{
+    if (cv_pageDirVirt == NULL)
+    {
+	// map in page directory.
+	kpanic("Page directory is not mapped into virtual memory");
+    }
+    
+    cv_pageDirVirt[i_idx] = i_flags
+			  | (cv_pageDirVirt[i_idx] & 0xFFFFF000);
+    cv_virtualPageDir[i_idx] = i_flags 
+			     | (cv_virtualPageDir[i_idx] & 0xFFFFF000);
+
+    return;
+}
 
 void PageDir::mapPage(uint32_t i_virtAddr, uint32_t i_physAddr)
 {
@@ -111,6 +137,7 @@ void PageDir::mapPage(uint32_t i_virtAddr, uint32_t i_physAddr)
     if (NULL == l_pageTable)
     {
 	// need to map it in.
+	kpanic("Page table is not mapped into virtual memory");
     }
     else
     {
@@ -119,3 +146,17 @@ void PageDir::mapPage(uint32_t i_virtAddr, uint32_t i_physAddr)
     return;
 }
 
+void PageDir::mapPageTable(uint32_t i_idx, 
+			   uint32_t i_virtAddr, 
+			   uint32_t i_physAddr)
+{
+    if (!cv_pageDirVirt)
+    {
+	// map in page table.
+	kpanic("Page directory not mapped into virtual memory.");
+    }
+
+    cv_pageDirVirt[i_idx] = i_physAddr | (cv_pageDirVirt[i_idx] & 0x0FFF);
+    cv_virtualPageDir[i_idx] = i_virtAddr | (cv_pageDirVirt[i_idx] & 0x0FFF);
+
+}
