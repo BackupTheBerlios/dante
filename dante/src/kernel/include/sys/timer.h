@@ -4,6 +4,8 @@
 #include <sys/interrupt.h>
 #include <stdint.h>
 
+void programPIT(int i_timer, int i_timeHz);
+
 class Timer_InterruptHandler : public InterruptHandler
 {
     public:

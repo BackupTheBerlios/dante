@@ -11,6 +11,7 @@
 #include <sys/gdt.h>
 #include <sys/task.h>
 #include <sys/interrupt.h>
+#include <sys/timer.h>
 
 #include <sys/io.h>
 
@@ -44,6 +45,7 @@ void KernelMain (void * i_bootHeader)
     }	
     //end static constructors. 
     
+    programPIT(0, 100);
     initializePIC(); // GRUB maps these to a low interrupt, map high before
 		     // enabling interrupts.
     initializeTasking();
@@ -69,7 +71,7 @@ void KernelMain (void * i_bootHeader)
     kout << "|";
     while (1)
     {
-#define SLEEP_A_BIT asm volatile("int $42")//for(int i = 0; i < 1000000; i++)
+#define SLEEP_A_BIT asm volatile("int $42")
 	kout << "\b/";
 	SLEEP_A_BIT;
 	kout << "\b-";

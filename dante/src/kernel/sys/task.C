@@ -50,7 +50,8 @@ void beginIdleThread()
     g_idleTask.cv_currentCPU = (CPUDescriptor *) NULL;
     g_scheduler.addTask(&g_idleTask);
     
-    asm volatile("mov %0, %%eax\nint $42" : : "a" (&g_idleStack[8188-12]));
+    // don't need to manually call scheduler anymore. 
+    //asm volatile("mov %0, %%eax\nint $42" : : "a" (&g_idleStack[8188-12]));
 }
 
 asm(".global __begin_idle_thread");
@@ -63,8 +64,7 @@ extern "C" void idleThread()
 {
     while(1)
     {
-	kout << "Idle." << endl;
+	//kout << "Idle." << endl;
 	asm volatile("hlt");
-	asm volatile("int $42");
     }
 }
