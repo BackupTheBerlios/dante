@@ -57,26 +57,17 @@ void KernelMain (void * i_bootHeader)
     kout << "\tKernel end at " << (uint32_t) &__KERNEL_END__ << "." << endl;
     kout << endl << endl;
     
-    /*register uint32_t reg_a;
-    asm volatile("mov %%dr0, %0" : "=r" (reg_a));
-    kout << "DR0 " << reg_a << endl;
-    asm volatile("mov %%dr1, %0" : "=r" (reg_a));
-    kout << "DR1 " << reg_a << endl;
-    asm volatile("mov %%dr2, %0" : "=r" (reg_a));
-    kout << "DR2 " << reg_a << endl;
-    asm volatile("mov %%dr3, %0" : "=r" (reg_a));
-    kout << "DR3 " << reg_a << endl;*/
-    
     g_multiBoot = MultiBootParser(i_bootHeader);
     
     g_kernelPageDirectory.info();
-    
+
     kout << endl << "Loading...";
+    beginIdleThread();
     
     kout << "|";
     while (1)
     {
-#define SLEEP_A_BIT asm volatile("hlt")//for(int i = 0; i < 1000000; i++)
+#define SLEEP_A_BIT asm volatile("int $42")//for(int i = 0; i < 1000000; i++)
 	kout << "\b/";
 	SLEEP_A_BIT;
 	kout << "\b-";

@@ -4,19 +4,27 @@
 #include <stdint.h>
 
 #include <sys/cpu.h>
+#include <mem/pageDir.h>
 
 struct TaskDescriptor
 {
     CPUDescriptor * cv_currentCPU;
 
     // registers..
-    uint32_t	cr3, esp, eflags;
-    uint32_t	eax, ebx, ecx, edx;
-    uint32_t	ebp, esi, edi;
+    //uint32_t	cr3, esp, eflags;
+    //uint32_t	eax, ebx, ecx, edx;
+    //uint32_t	ebp, esi, edi;
+
+    void * cv_stack;
+    void * cv_frameptr;
+    PageDir * cv_pageDir;     
+    
+    uint32_t cv_runtime; 
      
 } __attribute__((__packed__));
 
 void initializeTasking();
+void beginIdleThread();
 
 struct TSSDescriptor
 {

@@ -4,6 +4,7 @@
 #include <display/textStream.h>
 #include <sys/gdt.h>
 #include <sys/task.h>
+#include <sys/sched.h>
 
 #include <sys/io.h>
 
@@ -16,6 +17,7 @@ extern "C" void interrupt_handler(uint32_t i_int, uint32_t i_value)
 {
     //kout << "Interrupt " << i_int << ": " << i_value << endl;
     g_interruptHandlers[i_int]->handle(i_int, i_value);
+
 }
 
 void InterruptHandler::handle(int i_interrupt, int i_value)
@@ -26,6 +28,7 @@ void InterruptHandler::handle(int i_interrupt, int i_value)
     // Clear int setting on PIC if needed.
     if ((i_interrupt >= 0x30) && (i_interrupt <= 0x38))
 	outb(0x20, 0x20);
+
 }
 
 #define INTERRUPT_WITH_ERROR(number) \
@@ -42,7 +45,7 @@ void InterruptHandler::handle(int i_interrupt, int i_value)
     asm (".global __interrupt_"#number); \
     asm (".text"); \
     asm ("__interrupt_"#number":"); \
-    asm ("	pushl $0xBADF00D"); \
+    asm ("	pushl %eax"); \
     asm ("	pushl $"#number); \
     asm ("	jmp __interrupt_tail");
 
@@ -65,6 +68,8 @@ INTERRUPT_WITHOUT_ERROR(16);
 INTERRUPT_WITH_ERROR(17);
 INTERRUPT_WITHOUT_ERROR(18);
 INTERRUPT_WITHOUT_ERROR(19);
+
+INTERRUPT_WITHOUT_ERROR(42);
 
 INTERRUPT_WITHOUT_ERROR(48);
 INTERRUPT_WITHOUT_ERROR(49);
@@ -102,6 +107,9 @@ void initializeInterrupts()
 	g_idt[i+1] = g_idt[1];
 	g_interruptHandlers[i] = &g_defaultInterruptHandler;
     }
+
+    // Set up cooperative scheduler.
+    g_interruptHandlers[42] = &g_scheduler;
         
     INTERRUPT_DESCRIPTOR_ENTRY(0, __interrupt_0);
     INTERRUPT_DESCRIPTOR_ENTRY(1, __interrupt_1);
@@ -122,6 +130,8 @@ void initializeInterrupts()
     INTERRUPT_DESCRIPTOR_ENTRY(17, __interrupt_17);
     INTERRUPT_DESCRIPTOR_ENTRY(18, __interrupt_18);
     INTERRUPT_DESCRIPTOR_ENTRY(19, __interrupt_19);
+   
+    INTERRUPT_DESCRIPTOR_ENTRY(42, __interrupt_42); 
     
     INTERRUPT_DESCRIPTOR_ENTRY(48, __interrupt_48);
     INTERRUPT_DESCRIPTOR_ENTRY(49, __interrupt_49);

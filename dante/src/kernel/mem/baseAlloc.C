@@ -3,6 +3,8 @@
 
 #include <display/textStream.h>
 
+#define VERBOSE_MEMORY 0
+
 BaseAllocator g_baseAllocator;
 Allocator * g_Allocator = &g_baseAllocator;
 
@@ -58,9 +60,10 @@ void * BaseAllocator::allocate(uint32_t i_size)
 					    :
 					    (i_size) % 128
 					 );
-    
+#if VERBOSE_MEMORY 
     kout << "Allocated " << i_size << " bytes at 0x";
     kout << (uint32_t) &cv_memory[128 * cv_position] << endl;
+#endif
 
     return &cv_memory[128 * cv_position];
 }
@@ -95,7 +98,9 @@ void BaseAllocator::release(void * i_ptr)
 	cv_usage[l_pos] = 0;
     }
 
+#if VERBOSE_MEMORY
     kout << "Freed " << l_size << " bytes at " << (uint32_t) i_ptr << endl;
+#endif
     
     return;
 }
