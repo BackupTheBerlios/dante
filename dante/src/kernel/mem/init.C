@@ -3,15 +3,22 @@
 #include <sys/gdt.h>
 
 #include <display/textStream.h>
+
 uint32_t g_chunkOfMem[1024*3] __attribute__((__aligned__(4096)));
 uint32_t * g_pageDirectory;
 uint32_t * g_idt;
-GDTDescriptor g_gdt[6];
+GDTDescriptor g_gdt[6] = { 
+			    MakeDescriptor(0,0,0), //NULL descriptor
+			    MakeDescriptor(0,0xFFFFF, attr_Gran_4k | attr_Big_Addr | attr_Present | attr_Code | attr_Code_Read), //Code descriptor - RNG0
+			    MakeDescriptor(0,0xFFFFF, attr_Gran_4k | attr_Big_Addr | attr_Present | attr_Data_Write), //Data descriptor - RNG0
+			    MakeDescriptor(0,0,0),
+			    MakeDescriptor(0,0,0),
+			    MakeDescriptor(0,0,0)
+			};
 
 void initializePaging()
 {
 #define LOWPTR(x) ((uint32_t *) (((uint32_t) (x)) ^ 0xC0000000))
-//#define LOWPTR(x) ((uint32_t *) (x)) 
     uint32_t * l_pageTable;
     l_pageTable = LOWPTR(&g_chunkOfMem[0]);
     LOWPTR(&g_pageDirectory)[0]
