@@ -7,9 +7,9 @@
 
 uint32_t g_idt[512] __attribute__((__aligned__(4096)));
 
-extern "C" void interrupt_handler() 
+extern "C" void interrupt_handler(uint32_t i_int, uint32_t i_value) 
 {
-    kout << "Interrupt!" << endl;
+    kout << "Interrupt " << i_int << ": " << i_value << endl;
 }
 
 #define INTERRUPT_WITH_ERROR(number) \
@@ -26,7 +26,7 @@ extern "C" void interrupt_handler()
     asm (".global __interrupt_"#number); \
     asm (".text"); \
     asm ("__interrupt_"#number":"); \
-    asm ("	pushl $0"); \
+    asm ("	pushl $0xBADF00D"); \
     asm ("	pushl $"#number); \
     asm ("	jmp __interrupt_tail");
 
@@ -38,7 +38,7 @@ INTERRUPT_WITHOUT_ERROR(4);
 INTERRUPT_WITHOUT_ERROR(5);
 INTERRUPT_WITHOUT_ERROR(6);
 INTERRUPT_WITHOUT_ERROR(7);
-INTERRUPT_WITH_ERROR(8);
+INTERRUPT_WITHOUT_ERROR(8); // Why is this without? Seem to get spurious.
 INTERRUPT_WITHOUT_ERROR(9);
 INTERRUPT_WITH_ERROR(10);
 INTERRUPT_WITH_ERROR(11);
@@ -54,9 +54,12 @@ asm (".global __interrupt_tail");
 asm (".text");
 asm ("__interrupt_tail:");
 asm ("pusha");
+asm ("pushl 0x24(%esp)");
+asm ("pushl 0x24(%esp)");
 asm ("call interrupt_handler");
+asm ("add $0x8, %esp");
 asm ("popa");
-asm ("	add $0x4, %esp");
+asm ("	add $0x8, %esp");
 asm ("	iret");
 
 
@@ -113,6 +116,6 @@ void initializeInterrupts()
     
     // Turn on interrupts now.
     asm volatile("sti");
-
+    
 }
     

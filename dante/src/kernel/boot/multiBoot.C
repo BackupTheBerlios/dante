@@ -12,7 +12,7 @@ MultiBootParser::MultiBootParser()
 
 MultiBootParser::MultiBootParser(void * i_bootHeader)
 {
-    cv_verboseParsing = true;
+    cv_verboseParsing = false;
     parseHeader(i_bootHeader);
 }
 
@@ -167,6 +167,39 @@ void MultiBootParser::parseMemMap(void * i_addr)
 
     mb_out << "\t\tMemory Map length = " << cv_mapLength << " at ";
     mb_out << (uint32_t) cv_mapAddress << endl;
+
+    struct l_memMapStruct
+    {
+	uint32_t cv_size;
+	uint32_t cv_baseAddrLo;
+	uint32_t cv_baseAddrHi;
+	uint32_t cv_lengthLo;
+	uint32_t cv_lengthHi;
+	uint32_t cv_type;
+    } __attribute__((__packed__));
+    
+    l_memMapStruct * l_mapPointer = (l_memMapStruct *)
+			(((uint32_t)cv_mapAddress));
+    uint32_t l_bufSize = cv_mapLength;
+    for (int i = 0; l_bufSize >= sizeof(l_memMapStruct); i++)
+    {
+	mb_out << "\t\tMap " << i << "(";
+	mb_out << l_mapPointer->cv_type << "):" << endl;
+	mb_out << "\t\t\tSize = " << l_mapPointer->cv_size << endl;
+	mb_out << "\t\t\tBaseL = " << l_mapPointer->cv_baseAddrLo;
+	mb_out << "\tBaseH = " << l_mapPointer->cv_baseAddrHi << endl;
+	mb_out << "\t\t\tLenL  = " << l_mapPointer->cv_lengthLo;
+	mb_out << "\tLenH  = " << l_mapPointer->cv_lengthHi << endl;
+	
+	l_bufSize -= l_mapPointer->cv_size;
+	l_mapPointer = (l_memMapStruct *) 
+		    (((uint32_t)l_mapPointer) + l_mapPointer->cv_size + 
+			(0 == i ? 4 : 4));
+	
+	if (cv_verboseParsing)
+	    for (int z = 0; z < 1000000; z++) asm volatile("nop");
+    }
+
 }
 
 MultiBootParser g_multiBoot;
