@@ -12,6 +12,8 @@
 #include <sys/task.h>
 #include <sys/interrupt.h>
 
+#include <sys/io.h>
+
 extern "C"
 void KernelMain (void * i_bootHeader)
 {
@@ -68,7 +70,13 @@ void KernelMain (void * i_bootHeader)
     g_kernelPageDirectory.info();
     
     kout << endl << "Loading...";
-     
+    
+    outb(0x20, 0x11);
+    outb(0x21, 0x30);
+    outb(0x21, 0x04);
+    outb(0x21, 0x01);
+    outb(0x21, 0x00);
+    
     kout << "|";
     while (1)
     {

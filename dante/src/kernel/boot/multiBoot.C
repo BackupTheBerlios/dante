@@ -255,7 +255,7 @@ void MultiBootParser::parseMemMap(void * i_addr)
 
 		if (!l_found)
 		{
-		    g_freePageList.insert(l_addr, l_len >> 12);
+		    g_freePageList.insert(l_addr >> 12, l_len >> 12);
 		    l_len = 0;
 		}
 		else
@@ -267,7 +267,7 @@ void MultiBootParser::parseMemMap(void * i_addr)
 
 		    if (l_addr < l_start)
 		    {
-			g_freePageList.insert(l_addr, (l_start-l_addr) >> 12);
+			g_freePageList.insert(l_addr >> 12, (l_start-l_addr) >> 12);
 			l_len -= (l_start-l_addr);
 			l_addr = l_start;
 		    }

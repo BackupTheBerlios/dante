@@ -60,6 +60,16 @@ INTERRUPT_WITH_ERROR(17);
 INTERRUPT_WITHOUT_ERROR(18);
 INTERRUPT_WITHOUT_ERROR(19);
 
+INTERRUPT_WITHOUT_ERROR(48);
+INTERRUPT_WITHOUT_ERROR(49);
+INTERRUPT_WITHOUT_ERROR(50);
+INTERRUPT_WITHOUT_ERROR(51);
+INTERRUPT_WITHOUT_ERROR(52);
+INTERRUPT_WITHOUT_ERROR(53);
+INTERRUPT_WITHOUT_ERROR(54);
+INTERRUPT_WITHOUT_ERROR(55);
+
+
 asm (".global __interrupt_tail");
 asm (".text");
 asm ("__interrupt_tail:");
@@ -86,6 +96,8 @@ void initializeInterrupts()
 	g_idt[i+1] = g_idt[1];
 	g_interruptHandlers[i] = &g_defaultInterruptHandler;
     }
+    extern InterruptHandler g_globalTimer;
+    g_interruptHandlers[0x30] = &g_globalTimer;
     
     INTERRUPT_DESCRIPTOR_ENTRY(0, __interrupt_0);
     INTERRUPT_DESCRIPTOR_ENTRY(1, __interrupt_1);
@@ -106,6 +118,15 @@ void initializeInterrupts()
     INTERRUPT_DESCRIPTOR_ENTRY(17, __interrupt_17);
     INTERRUPT_DESCRIPTOR_ENTRY(18, __interrupt_18);
     INTERRUPT_DESCRIPTOR_ENTRY(19, __interrupt_19);
+    
+    INTERRUPT_DESCRIPTOR_ENTRY(48, __interrupt_48);
+    INTERRUPT_DESCRIPTOR_ENTRY(49, __interrupt_49);
+    INTERRUPT_DESCRIPTOR_ENTRY(50, __interrupt_50);
+    INTERRUPT_DESCRIPTOR_ENTRY(51, __interrupt_51);
+    INTERRUPT_DESCRIPTOR_ENTRY(52, __interrupt_52);
+    INTERRUPT_DESCRIPTOR_ENTRY(53, __interrupt_53);
+    INTERRUPT_DESCRIPTOR_ENTRY(54, __interrupt_54);
+    INTERRUPT_DESCRIPTOR_ENTRY(55, __interrupt_55);
 
     
     GDTPtr l_tablePtr = { 512*4, (GDTDescriptor *) g_idt };
