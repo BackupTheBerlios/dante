@@ -7,9 +7,19 @@
 
 uint32_t g_idt[512] __attribute__((__aligned__(4096)));
 
+InterruptHandler g_defaultInterruptHandler;
+InterruptHandler * g_interruptHandlers[256];
+
 extern "C" void interrupt_handler(uint32_t i_int, uint32_t i_value) 
 {
-    kout << "Interrupt " << i_int << ": " << i_value << endl;
+    //kout << "Interrupt " << i_int << ": " << i_value << endl;
+    g_interruptHandlers[i_int]->handle(i_int, i_value);
+}
+
+void InterruptHandler::handle(int i_interrupt, int i_value)
+{
+    kout << "Un-handled interrupt occured. " << i_interrupt << ": " 
+	 << i_value << endl;
 }
 
 #define INTERRUPT_WITH_ERROR(number) \
@@ -74,6 +84,7 @@ void initializeInterrupts()
     {
 	g_idt[i] = g_idt[0];
 	g_idt[i+1] = g_idt[1];
+	g_interruptHandlers[i] = &g_defaultInterruptHandler;
     }
     
     INTERRUPT_DESCRIPTOR_ENTRY(0, __interrupt_0);

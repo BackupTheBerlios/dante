@@ -7,4 +7,12 @@ extern uint32_t g_idt[512];
 
 void initializeInterrupts();
 
+class InterruptHandler
+{
+    public:
+	virtual void handle(int i_interrupt, int i_value);
+};
+
+extern InterruptHandler * g_interruptHandlers[256];
+
 #endif
