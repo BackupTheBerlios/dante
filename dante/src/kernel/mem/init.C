@@ -1,10 +1,12 @@
 #include <mem/init.h>
 #include <stdint.h>
+#include <sys/gdt.h>
 
 #include <display/textStream.h>
 uint32_t g_chunkOfMem[1024*3] __attribute__((__aligned__(4096)));
 uint32_t * g_pageDirectory;
-uint32_t * g_gdt;
+uint32_t * g_idt;
+GDTDescriptor g_gdt[6];
 
 void initializePaging()
 {
@@ -14,7 +16,7 @@ void initializePaging()
     l_pageTable = LOWPTR(&g_chunkOfMem[0]);
     LOWPTR(&g_pageDirectory)[0]
 		= (uint32_t) (((uint32_t)(l_pageTable)) + 0x1000);
-    LOWPTR(&g_gdt)[0] = (uint32_t) (((uint32_t)(l_pageTable)) + 0x2000);
+    LOWPTR(&g_idt)[0] = (uint32_t) (((uint32_t)(l_pageTable)) + 0x2000);
     
     l_pageTable[0] = 0 | 02; // Don't want to access page 0. (NULL)
     // set up rest of first 4MB.
@@ -34,7 +36,10 @@ void initializePaging()
     asm("mov %%cr0, %0" : "=r" (reg_a) :);
     reg_a |= 0x80000000;
     asm("mov %0, %%cr0" : :"r" (reg_a));
-
     
+    // clear IDT.
+    for(int i = 0; i < 512; i++)
+	g_idt[i] = 0;
+     
     return;
 }

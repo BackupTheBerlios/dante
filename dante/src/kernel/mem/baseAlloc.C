@@ -53,7 +53,11 @@ void * BaseAllocator::allocate(uint32_t i_size)
     {
 	cv_usage[cv_position+i] = 0xFF;
     }
-    cv_usage[cv_position+(l_blocks-1)] = (i_size+1) % 128;
+    cv_usage[cv_position+(l_blocks-1)] = (i_size % 128 == 0 ?
+					    128
+					    :
+					    (i_size) % 128
+					 );
     
     kout << "Allocated " << i_size << " bytes at 0x";
     kout << (uint32_t) &cv_memory[128 * cv_position] << endl;
@@ -63,6 +67,36 @@ void * BaseAllocator::allocate(uint32_t i_size)
 
 void BaseAllocator::release(void * i_ptr)
 {
+    uint32_t l_pos = (((uint32_t)i_ptr) - ((uint32_t)cv_memory)) / 128;
+    uint32_t l_size = 0;
+    
+    if ((i_ptr < (void *)cv_memory) || (i_ptr > (void *)&cv_memory[cv_baseSize]))
+    {
+	if (NULL == cv_oldAlloc)
+	{
+	    kout << "Bad ptr: " << (uint32_t) i_ptr << endl;
+	}
+	else
+	{
+	    cv_oldAlloc->release(i_ptr);
+	}
+	return;
+    }
+    
+    while((cv_usage[l_pos] == 0xFF) && ((cv_baseSize/128) > l_pos))
+    {
+	    cv_usage[l_pos] = 0;
+	    l_pos++;
+	    l_size+=128;
+    }
+    if ((cv_baseSize/128) > l_pos)
+    {
+	l_size += cv_usage[l_pos];
+	cv_usage[l_pos] = 0;
+    }
+
+    kout << "Freed " << l_size << " bytes at " << (uint32_t) i_ptr << endl;
+    
     return;
 }
 
