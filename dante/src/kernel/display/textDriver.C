@@ -58,7 +58,7 @@ void TextDriver::print(const char * i_string)
     }
     //update cursor
     #define outb(port,value)\
-	asm volatile("outb %%al,%%dx"::"d" (port), "a" (value))
+	asm volatile("outb %%al,%%dx": :"d" (port), "a" (value))
     outb(0x3D4, 0x0F);
     outb(0x3D5, (unsigned char) cv_pos & 0xFF);
     outb(0x3D4, 0x0E);
