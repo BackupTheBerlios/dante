@@ -4,9 +4,8 @@
 
 #include <display/textStream.h>
 
-static uint32_t g_chunkOfMem[1024*3] __attribute__((__aligned__(4096)));
+static uint32_t g_chunkOfMem[1024*2] __attribute__((__aligned__(4096)));
 uint32_t * g_pageDirectory;
-uint32_t * g_idt;
 GDTDescriptor g_gdt[GDT_DESC_SIZE] = { 
 			    MakeDescriptor(0,0,0), //NULL descriptor
 			    MakeDescriptor(0x0,0xFFFFF, attr_Segment | attr_Gran_4k | attr_Big_Addr | attr_Present | attr_Code | attr_Code_Read), //Code descriptor - RNG0
@@ -23,7 +22,6 @@ void initializePaging()
     l_pageTable = LOWPTR(&g_chunkOfMem[0]);
     LOWPTR(&g_pageDirectory)[0]
 		= (uint32_t) (((uint32_t)(l_pageTable)) + 0x1000);
-    LOWPTR(&g_idt)[0] = (uint32_t) (((uint32_t)(l_pageTable)) + 0x2000);
     
     l_pageTable[0] = 0 | 02; // Don't want to access page 0. (NULL)
     // set up rest of first 4MB.
@@ -43,10 +41,6 @@ void initializePaging()
     asm volatile("mov %%cr0, %0" : "=r" (reg_a) :);
     reg_a |= 0x80000000;
     asm volatile("mov %0, %%cr0" : :"r" (reg_a));
-    
-    // clear IDT.
-    for(int i = 0; i < 512; i++)
-	g_idt[i] = 0;
     
     // load GDT 
     GDTPtr l_tablePtr = { GDT_DESC_SIZE*8 , (g_gdt) };

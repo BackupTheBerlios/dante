@@ -9,6 +9,7 @@
 
 #include <sys/gdt.h>
 #include <sys/task.h>
+#include <sys/interrupt.h>
 
 extern "C"
 void KernelMain (void * i_bootHeader)
@@ -32,6 +33,7 @@ void KernelMain (void * i_bootHeader)
     //end static constructors. 
     
     initializeTasking();
+    initializeInterrupts();
     
     kout.clear();
 

@@ -1,6 +1,10 @@
 #include <stdint.h>
 
+#include <sys/interrupt.h>
 #include <display/textStream.h>
+#include <sys/gdt.h>
+
+uint32_t g_idt[512] __attribute__((__aligned__(4096)));
 
 extern "C" void interrupt_handler() 
 {
@@ -8,6 +12,7 @@ extern "C" void interrupt_handler()
 }
 
 #define INTERRUPT_WITH_ERROR(number) \
+    extern "C" void __interrupt_##number (); \
     asm(".global __interrupt_"#number); \
     asm("__interrupt_"#number":"); \
     asm("	pushl $"#number); \
@@ -15,6 +20,7 @@ extern "C" void interrupt_handler()
  
 
 #define INTERRUPT_WITHOUT_ERROR(number) \
+    extern "C" void __interrupt_##number (); \
     asm(".global __interrupt_"#number); \
     asm("__interrupt_"#number":"); \
     asm("	pushl $0"); \
@@ -47,3 +53,20 @@ asm("call interrupt_handler");
 asm("	add $0x8, %esp");
 asm("	iret");
 
+
+#define INTERRUPT_DESCRIPTOR_ENTRY(index, address) \
+    g_idt[index*2] = (((uint32_t) address) & 0xffff) | 0x100000; \
+    g_idt[index*2+1] = 0x8E00 | (((uint32_t) address) & 0xffff0000)
+
+void initializeInterrupts()
+{
+    for (int i = 0; i < 512; i++)
+	g_idt[i] = 0;
+    
+    INTERRUPT_DESCRIPTOR_ENTRY(0, __interrupt_0);
+    
+    GDTPtr l_tablePtr = { 512*4, (GDTDescriptor *) g_idt };
+    asm volatile("lidt %0" : : "m" (l_tablePtr));
+
+}
+    
