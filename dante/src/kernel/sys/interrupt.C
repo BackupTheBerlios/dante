@@ -5,6 +5,8 @@
 #include <sys/gdt.h>
 #include <sys/task.h>
 
+#include <sys/io.h>
+
 uint32_t g_idt[512] __attribute__((__aligned__(4096)));
 
 InterruptHandler g_defaultInterruptHandler;
@@ -20,6 +22,10 @@ void InterruptHandler::handle(int i_interrupt, int i_value)
 {
     kout << "Un-handled interrupt occured. " << i_interrupt << ": " 
 	 << i_value << endl;
+    
+    // Clear int setting on PIC if needed.
+    if ((i_interrupt >= 0x30) && (i_interrupt <= 0x38))
+	outb(0x20, 0x20);
 }
 
 #define INTERRUPT_WITH_ERROR(number) \
@@ -96,9 +102,7 @@ void initializeInterrupts()
 	g_idt[i+1] = g_idt[1];
 	g_interruptHandlers[i] = &g_defaultInterruptHandler;
     }
-    extern InterruptHandler g_globalTimer;
-    g_interruptHandlers[0x30] = &g_globalTimer;
-    
+        
     INTERRUPT_DESCRIPTOR_ENTRY(0, __interrupt_0);
     INTERRUPT_DESCRIPTOR_ENTRY(1, __interrupt_1);
     INTERRUPT_DESCRIPTOR_ENTRY(2, __interrupt_2);
@@ -150,4 +154,19 @@ void initializeInterrupts()
     asm volatile("sti");
     
 }
+
+void initializePIC()
+{
+    extern InterruptHandler g_globalTimer;
+    g_interruptHandlers[0x30] = &g_globalTimer;
+    
+    // Enable Master PIC, remap interrupts to 0x30.
+    outb(0x20, 0x11);
+    outb(0x21, 0x30);
+    outb(0x21, 0x04);
+    outb(0x21, 0x01);
+    outb(0x21, 0x00);
+    
+
+};
     

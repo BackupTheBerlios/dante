@@ -6,6 +6,7 @@
 extern uint32_t g_idt[512];
 
 void initializeInterrupts();
+void initializePIC();
 
 class InterruptHandler
 {
