@@ -38,6 +38,10 @@ class MultiBootParser
 	void parseSymbolTable(void *, imageType = UNKNOWN);
 	imageType cv_imageType;
 	void * cv_symbolAddress;
+
+	void parseMemMap(void *);
+	uint32_t cv_mapLength;
+	void * cv_mapAddress;
 		
 
 };

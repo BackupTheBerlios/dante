@@ -1,9 +1,9 @@
 all:
-	make -C src
-	make -C obj
+	(cd src; make)
+	(cd obj; make)
 
 clean:
-	make -C obj clean
+	(cd obj; make clean)
 
 doxygen:
 	doxygen dante.dxy

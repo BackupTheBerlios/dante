@@ -12,7 +12,7 @@ MultiBootParser::MultiBootParser()
 
 MultiBootParser::MultiBootParser(void * i_bootHeader)
 {
-    cv_verboseParsing = false;
+    cv_verboseParsing = true;
     parseHeader(i_bootHeader);
 }
 
@@ -75,6 +75,7 @@ void MultiBootParser::parseHeader(void * i_bootHeader)
     if (l_tmpFlags & 0x01)
     {
 	mb_out << "\tFound memory map." << endl;
+	this->parseMemMap(&l_bootHeader[11]);
     }
     l_tmpFlags >>= 1;
 
@@ -156,4 +157,16 @@ void MultiBootParser::parseSymbolTable(void * i_addr, imageType i_type)
 
     mb_out << "\t\tSymbol info at " << (uint32_t) cv_symbolAddress << endl;
 }
+
+void MultiBootParser::parseMemMap(void * i_addr)
+{
+    NullStream nout;
+
+    cv_mapLength = ((uint32_t *) i_addr)[0];
+    cv_mapAddress = ((void **) i_addr)[1];
+
+    mb_out << "\t\tMemory Map length = " << cv_mapLength << " at ";
+    mb_out << (uint32_t) cv_mapAddress << endl;
+}
+
 MultiBootParser g_multiBoot;

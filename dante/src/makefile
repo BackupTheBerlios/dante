@@ -1,2 +1,2 @@
 all:
-	(make -C kernel)
+	(cd kernel; make)
