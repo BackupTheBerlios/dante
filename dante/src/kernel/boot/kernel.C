@@ -34,9 +34,9 @@ void KernelMain (void * i_bootHeader)
     
     initializeTasking();
     initializeInterrupts();
+   
+    kout.clear(); 
     
-    kout.clear();
-
     kout << endl << "Dante -- Inferno Kernel v0.1" << endl;
     kout << "\tKernelMain loaded at " << (unsigned int) &KernelMain << ".";
     kout << endl << endl;

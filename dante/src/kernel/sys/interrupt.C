@@ -55,7 +55,7 @@ asm("	iret");
 
 
 #define INTERRUPT_DESCRIPTOR_ENTRY(index, address) \
-    g_idt[index*2] = (((uint32_t) address) & 0xffff) | 0x100000; \
+    g_idt[index*2] = (((uint32_t) address) & 0xffff) | 0x080000; \
     g_idt[index*2+1] = 0x8E00 | (((uint32_t) address) & 0xffff0000)
 
 void initializeInterrupts()
@@ -64,12 +64,28 @@ void initializeInterrupts()
 	g_idt[i] = 0;
     
     INTERRUPT_DESCRIPTOR_ENTRY(0, __interrupt_0);
+    INTERRUPT_DESCRIPTOR_ENTRY(1, __interrupt_1);
+    INTERRUPT_DESCRIPTOR_ENTRY(2, __interrupt_2);
+    INTERRUPT_DESCRIPTOR_ENTRY(3, __interrupt_3);
+    INTERRUPT_DESCRIPTOR_ENTRY(4, __interrupt_4);
+    INTERRUPT_DESCRIPTOR_ENTRY(5, __interrupt_5);
+    INTERRUPT_DESCRIPTOR_ENTRY(6, __interrupt_6);
+    INTERRUPT_DESCRIPTOR_ENTRY(7, __interrupt_7);
+    INTERRUPT_DESCRIPTOR_ENTRY(8, __interrupt_8);
+    INTERRUPT_DESCRIPTOR_ENTRY(9, __interrupt_9);
+    INTERRUPT_DESCRIPTOR_ENTRY(10, __interrupt_10);
+    INTERRUPT_DESCRIPTOR_ENTRY(11, __interrupt_11);
+    INTERRUPT_DESCRIPTOR_ENTRY(12, __interrupt_12);
+    INTERRUPT_DESCRIPTOR_ENTRY(13, __interrupt_13);
+    INTERRUPT_DESCRIPTOR_ENTRY(14, __interrupt_14);
+    INTERRUPT_DESCRIPTOR_ENTRY(16, __interrupt_16);
+    INTERRUPT_DESCRIPTOR_ENTRY(17, __interrupt_17);
+    INTERRUPT_DESCRIPTOR_ENTRY(18, __interrupt_18);
+    INTERRUPT_DESCRIPTOR_ENTRY(19, __interrupt_19);
+
     
     GDTPtr l_tablePtr = { 512*4, (GDTDescriptor *) g_idt };
     asm volatile("lidt %0" : : "m" (l_tablePtr));
-    asm volatile("ljmp $0x08, $int_finalize\n"
-		 "int_finalize:");
-		 
 
 }
     
