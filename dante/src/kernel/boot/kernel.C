@@ -13,6 +13,10 @@ extern "C"
 void KernelMain (void * i_bootHeader)
 {
     initializePaging();
+
+    //patch up address.
+    asm volatile("ljmp $0x08, $main_patch\nmain_patch:" : :);
+    
     //do static constructors.
     extern void (* __CTOR_LIST__)();
     void (** l_ctor)() = &__CTOR_LIST__;
